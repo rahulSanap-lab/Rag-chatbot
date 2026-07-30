@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { chatApi, documentApi, settingsApi } from '../services/api';
+import { chatApi, documentApi, settingsApi, API_BASE_URL } from '../services/api';
 
 const ChatContext = createContext();
 
@@ -163,7 +163,7 @@ export const ChatProvider = ({ children }) => {
 
     try {
       // Use Fetch EventSource for SSE streaming
-      const response = await fetch('http://localhost:8000/api/chat/stream', {
+      const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

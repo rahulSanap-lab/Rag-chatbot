@@ -27,6 +27,7 @@ app = FastAPI(
 
 # CORS Configuration
 origins = [
+    "https://rag-chatbot-15m0.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
@@ -52,6 +53,11 @@ app.include_router(chat.router)
 app.include_router(dashboard.router)
 app.include_router(settings_api.router)
 
+# Mount frontend build static files if present (for single service deployment)
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+
 @app.get("/health")
 def health_check():
     return {
@@ -71,4 +77,5 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

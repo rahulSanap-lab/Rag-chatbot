@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: rag-chatbot
+    env: python
+    buildCommand: |
+      pip install -r backend/requirements.txt
+      cd ../frontend && npm install && npm run build
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DEFAULT_LLM_MODEL
+        value: llama-3.3-70b-versatile
+      - key: EMBEDDING_PROVIDER
+        value: sentence-transformers
