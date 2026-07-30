@@ -54,12 +54,8 @@ app.include_router(chat.router)
 app.include_router(dashboard.router)
 app.include_router(settings_api.router)
 
-# Mount frontend build static files if present (for single service deployment)
-frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
-if os.path.exists(frontend_dist):
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
-
 @app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {
         "status": "online",
@@ -67,6 +63,11 @@ def health_check():
         "llm_default": settings.DEFAULT_LLM_MODEL,
         "embedding_provider": settings.EMBEDDING_PROVIDER
     }
+
+# Mount frontend build static files if present (for single service deployment)
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
+if os.path.exists(frontend_dist) and os.getenv("SERVE_FRONTEND", "").lower() == "true":
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
